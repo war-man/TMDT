@@ -1,0 +1,520 @@
+﻿@model IEnumerable<Models.Database.TaiKhoan>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">DANH SÁCH TÀI KHOẢN</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<hr>
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <!-- Search form -->
+        <div class="row">
+            <div class="col-lg-1">
+                <button class="btn btn-primary" data-toggle="modal" data-target="#themModal">Thêm</button>
+            </div>
+            <div class="col-lg-2">
+                <div class="form-group">
+                    <select class="form-control" id="sortList" onchange="window.location.href = SearchAndSort()">
+                        <option selected disabled>Sắp xếp theo</option>
+                        <option value="/Webmaster/TaiKhoan/Sort?sortorder=tendangnhap-az">Tên đăng nhập (A-Z)</option>
+                        <option value="/Webmaster/TaiKhoan/Sort?sortorder=tendangnhap-za">Tên đăng nhập (Z-A)</option>
+                        <option value="/Webmaster/TaiKhoan/Sort?sortorder=ten-az">Tên (A-Z)</option>
+                        <option value="/Webmaster/TaiKhoan/Sort?sortorder=ten-za">Tên (Z-A)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-lg-1">
+                <button class="btn btn-danger btnCanhBao" data-toggle="modal" data-target="#canhbaoModal">Cảnh cáo</button>
+            </div>
+            <div class="col-lg-5"></div>
+            <div class="col-lg-3">
+                <form asp-controller="TaiKhoan" asp-action="Search" method="get">
+                    <div class="input-group custom-search-form">
+                        <input type="text" class="form-control" id="searchList" placeholder="Tìm kiếm..." name="search">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="submit">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </span>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+        <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Tên đăng nhập</th>
+                    <th>Họ tên</th>
+                    <th>Tên shop</th>
+                    <th>Email</th>
+                    <th>Điện thoại</th>
+                    <th>CMND</th>
+                    <th>Loại người dùng</th>
+                    <th>Ngày tạo</th>
+                    <th>Thời hạn</th>
+                    <th>Đánh giá</th>
+                    <th>Tình trạng</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody class="body-content">
+                @foreach (var item in Model)
+                {
+                    <tr class="odd gradeX">
+                        <td class="item-tendangnhap">@item.TenDangNhap</td>
+                        <td class="item-ten">@item.Ten</td>
+                        <td class="item-tenshop">@item.TenShop</td>
+                        <td class="item-email">@item.Email</td>
+                        <td class="item-dienthoai">@item.DienThoai</td>
+                        <td class="item-cmnd">@item.Cmnd</td>
+                        <td class="item-loainguoidung">@item.IdLoaiNguoiDungNavigation.TenLoaiNguoiDung</td>
+                        <td class="item-ngaytao">@item.NgayTao</td>
+                        <td class="item-thoihan">@item.ThoiHanGianHang</td>
+                        <td class="item-danhgia">@item.DanhGia</td>
+                        <td class="item-tinhtrang">@item.TinhTrang</td>
+                        <td>
+                            @switch (item.TinhTrang)
+                            {
+                                case "Không khoá":
+                                    <button class="btn btn-primary btnSuaTaiKhoan" type="button" data-toggle="modal" data-target="#suaModal">Sửa</button>
+                                    <a asp-controller="TaiKhoan" asp-action="LockTaiKhoan" asp-route-tendangnhap="@item.TenDangNhap" class="btn btn-danger">Khoá</a>
+                                    break;
+                                case "Khoá":
+                                    <button class="btn btn-primary btnSuaTaiKhoan" type="button" data-toggle="modal" data-target="#suaModal" disabled>Sửa</button>
+                                    <a asp-controller="TaiKhoan" asp-action="UnlockTaiKhoan" asp-route-tendangnhap="@item.TenDangNhap" class="btn btn-danger">Mở khoá</a>
+                                    break;
+                                case "Chưa kích hoạt":
+                                    <button class="btn btn-primary btnSuaTaiKhoan" type="button" data-toggle="modal" data-target="#suaModal" disabled>Sửa</button>
+                                    <a asp-controller="TaiKhoan" asp-action="ActivateTaiKhoan" asp-route-tendangnhap="@item.TenDangNhap" class="btn btn-warning">Kích hoạt</a>
+                                    break;
+                                case "Chưa xác nhận":
+                                    <button class="btn btn-primary btnSuaTaiKhoan" type="button" data-toggle="modal" data-target="#suaModal" disabled>Sửa</button>
+                                    <a asp-controller="TaiKhoan" asp-action="ActivateTaiKhoan" asp-route-tendangnhap="@item.TenDangNhap" class="btn btn-info">Xác nhận</a>
+                                    break;
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <!-- /.table-responsive -->
+        <ul class="pagination" style="margin: 0 auto;">
+            @if (ViewBag.TrangHienTai == 1)
+            {
+                <li class="paginate_button page-item previous disabled" id="dataTable_previous">
+                    <a href="#" aria-controls="dataTable" data-dt-idx="0" tabindex="0" class="page-link">Trước</a>
+                </li>
+            }
+            else
+            {
+                <li class="paginate_button page-item previous" id="dataTable_previous">
+                    @switch (ViewBag.TrangThai)
+                    {
+                        case "index":
+                            <a asp-controller="TaiKhoan" asp-action="Index" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai - 1)" aria-controls="dataTable" data-dt-idx="0" tabindex="0" class="page-link pageNumber">Trước</a>
+                            break;
+                        case "sort":
+                            <a asp-controller="TaiKhoan" asp-action="Sort" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai - 1)" aria-controls="dataTable" data-dt-idx="0" tabindex="0" class="page-link pageNumber">Trước</a>
+                            break;
+                        case "search":
+                            <a asp-controller="TaiKhoan" asp-action="Search" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai - 1)" aria-controls="dataTable" data-dt-idx="0" tabindex="0" class="page-link pageNumber">Trước</a>
+                            break;
+                        case "searchandsort":
+                            <a asp-controller="TaiKhoan" asp-action="SearchAndSort" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai - 1)" aria-controls="dataTable" data-dt-idx="0" tabindex="0" class="page-link pageNumber">Trước</a>
+                            break;
+                    }
+                </li>
+            }
+            @for (int i = 1; i <= ViewBag.TongTrang; i++)
+            {
+                if (i > 5)
+                {
+                    <li class="paginate_button page-item" disabled><a class="page-link" aria-controls="dataTable" data-dt-idx="0" tabindex="0" href="#">...</a></li>
+                    <li class="paginate_button page-item">
+                        @switch (ViewBag.TrangThai)
+                        {
+                            case "index":
+                                <a asp-controller="TaiKhoan" asp-action="Index" asp-route-pagenumber="@Html.Raw(ViewBag.TongTrang)" class="pageNumber">@ViewBag.TongTrang</a>
+                                break;
+                            case "sort":
+                                <a asp-controller="TaiKhoan" asp-action="Sort" asp-route-pagenumber="@Html.Raw(ViewBag.TongTrang)" class="pageNumber">@ViewBag.TongTrang</a>
+                                break;
+                            case "search":
+                                <a asp-controller="TaiKhoan" asp-action="Search" asp-route-pagenumber="@Html.Raw(ViewBag.TongTrang)" class="pageNumber">@ViewBag.TongTrang</a>
+                                break;
+                            case "searchandsort":
+                                <a asp-controller="TaiKhoan" asp-action="SearchAndSort" asp-route-pagenumber="@Html.Raw(ViewBag.TongTrang)" class="pageNumber">@ViewBag.TongTrang</a>
+                                break;
+                        }
+                    </li>
+                    break;
+                }
+                else
+                {
+                    if (i == ViewBag.TrangHienTai)
+                    {
+                        <li class="paginate_button page-item active"><a href="#" class="page-link" aria-controls="dataTable" data-dt-idx="2" tabindex="0">@i</a></li>
+                    }
+                    else
+                    {
+                        <li class="paginate_button page-item" aria-controls="dataTables-example" tabindex="0">
+                            @switch (ViewBag.TrangThai)
+                            {
+                                case "index":
+                                    <a asp-controller="TaiKhoan" asp-action="Index" asp-route-pagenumber="@i" class="page-link pageNumber" aria-controls="dataTable" data-dt-idx="3" tabindex="0">@i</a>
+                                    break;
+                                case "sort":
+                                    <a asp-controller="TaiKhoan" asp-action="Sort" asp-route-pagenumber="@i" class="page-link pageNumber" aria-controls="dataTable" data-dt-idx="3" tabindex="0">@i</a>
+                                    break;
+                                case "search":
+                                    <a asp-controller="TaiKhoan" asp-action="Search" asp-route-pagenumber="@i" class="page-link pageNumber" aria-controls="dataTable" data-dt-idx="3" tabindex="0">@i</a>
+                                    break;
+                                case "searchandsort":
+                                    <a asp-controller="TaiKhoan" asp-action="SearchAndSort" asp-route-pagenumber="@i" class="page-link pageNumber" aria-controls="dataTable" data-dt-idx="3" tabindex="0">@i</a>
+                                    break;
+                            }
+                        </li>
+                    }
+                }
+            }
+            @if (ViewBag.TrangHienTai == ViewBag.TongTrang)
+            {
+                <li class="paginate_button page-item next disabled" id="dataTable_next"><a class="page-link" aria-controls="dataTable" data-dt-idx="7" tabindex="0" href="#">Tiếp</a></li>
+            }
+            else
+            {
+                <li class="paginate_button page-item next" id="dataTable_next">
+                    @switch (ViewBag.TrangThai)
+                    {
+                        case "index":
+                            <a asp-controller="TaiKhoan" asp-action="Index" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai + 1)" aria-controls="dataTable" data-dt-idx="7" tabindex="0" class="page-link pageNumber">Tiếp</a>
+                            break;
+                        case "sort":
+                            <a asp-controller="TaiKhoan" asp-action="Sort" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai + 1)" aria-controls="dataTable" data-dt-idx="7" tabindex="0" class="page-link pageNumber">Tiếp</a>
+                            break;
+                        case "search":
+                            <a asp-controller="TaiKhoan" asp-action="Search" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai + 1)" aria-controls="dataTable" data-dt-idx="7" tabindex="0" class="page-link pageNumber">Tiếp</a>
+                            break;
+                        case "searchandsort":
+                            <a asp-controller="TaiKhoan" asp-action="SearchAndSort" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai + 1)" aria-controls="dataTable" data-dt-idx="7" tabindex="0" class="page-link pageNumber">Tiếp</a>
+                            break;
+                    }
+                </li>
+            }
+        </ul>
+    </div>
+</div>
+</br>
+<!-- /.panel-body -->
+<!--canhcao--->
+<div class="modal fade" id="canhbaoModal" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                @*<button type="button" class="close" data-dismiss="modal">&times;</button>*@
+                <h4 class="modal-title">Cảnh cáo</h4>
+            </div>
+            <div class="modal-body" id="canhbaoModal-body">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal thêm -->
+<div class="modal fade" id="themModal" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <form asp-controller="TaiKhoan" asp-action="CreateTaiKhoan" method="post">
+            <div class="modal-content">
+                <div class="modal-header">
+                    @*<button type="button" class="close" data-dismiss="modal">&times;</button>*@
+                    <h4 class="modal-title">Tài khoản</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Tên đăng nhập</label>
+                        <input type="text" class="form-control" id="item-them-tendangnhap" name="item_them_tendangnhap" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Mật khẩu</label>
+                        <input type="password" class="form-control" id="item-them-matkhau" name="item_them_matkhau" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tên</label>
+                        <input type="text" class="form-control" id="item-them-ten" name="item_them_ten" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tên shop (bỏ trống nếu là khách hàng)</label>
+                        <input type="text" class="form-control" id="item-them-tenshop" name="item_them_tenshop">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" class="form-control" id="item-them-email" name="item_them_email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Điện thoại</label>
+                        <input type="text" class="form-control" id="item-them-dienthoai" name="item_them_dienthoai" maxlength="20" required>
+                    </div>
+                    <div class="form-group">
+                        <label>CMND (có thể bỏ trống nếu là khách hàng)</label>
+                        <input type="text" class="form-control" id="item-them-cmnd" name="item_them_cmnd" maxlength="20">
+                    </div>
+                    <div class="form-group">
+                        <label>Loại người dùng</label>
+                        <select class="form-control" id="item-them-loainguoidung" name="item_them_loainguoidung">
+                            @foreach (var item in ViewBag.LoaiNguoiDung)
+                            {
+                                @if (item.TenLoaiNguoiDung != "Webmaster")
+                                {
+                                    <option value="@item.Id">@item.TenLoaiNguoiDung</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-warning" id="btnThemTaiKhoan">Thêm</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal sửa -->
+<div class="modal fade" id="suaModal" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <form asp-controller="TaiKhoan" asp-action="EditTaiKhoan" method="post">
+            <div class="modal-content">
+                <div class="modal-header">
+                    @*<button type="button" class="close" data-dismiss="modal">&times;</button>*@
+                    <h4 class="modal-title">Tài khoản</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Tên đăng nhập</label>
+                        <input type="text" class="form-control" id="item-sua-tendangnhap" name="item_sua_tendangnhap" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Mật khẩu</label>
+                        <input type="password" class="form-control" id="item-sua-matkhau" name="item_sua_matkhau" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Tên</label>
+                        <input type="text" class="form-control" id="item-sua-ten" name="item_sua_ten" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Tên shop</label>
+                        <input type="text" class="form-control" id="item-sua-tenshop" name="item_sua_tenshop">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" class="form-control" id="item-sua-email" name="item_sua_email" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Điện thoại</label>
+                        <input type="text" class="form-control" id="item-sua-dienthoai" name="item_sua_dienthoai" maxlength="20" pattern=".{10,12}" required oninvalid="this.setCustomValidity('Số điện thoại chứa 10 - 12 ký tự')" onchange="this.setCustomValidity('')"
+                    </div>
+                    <div class="form-group">
+                        <label>CMND</label>
+                        <input type="text" class="form-control" id="item-sua-cmnd" name="item_sua_cmnd" maxlength="20" pattern=".{9,10}" required oninvalid="this.setCustomValidity('CMND không hợp lệ')" onchange="this.setCustomValidity('')">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-warning">Sửa</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal địa chỉ -->
+@*<div class="modal fade" id="diachiModal" role="dialog">
+    <div class="modal-dialog">
+         Modal content
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Địa chỉ</h4>
+            </div>
+            <div class="modal-body" id="diachiModal-body">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>*@
+
+<!-- Modal gian hàng -->
+@*<div class="modal fade" id="gianhangModal" role="dialog">
+    <div class="modal-dialog">
+         Modal content
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Gian hàng</h4>
+            </div>
+            <div class="modal-body" id="gianhangModal-body">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>*@
+
+
+
+@if (ViewBag.ThongBao != null)
+{
+    <script>
+        alert("@Html.Raw(ViewBag.ThongBao)");
+    </script>
+}
+
+<script>
+    function SearchAndSort() {
+        let search = "@ViewBag.Search";
+        if (search == null || search == '') {
+            return $("#sortList").val();
+        }
+        else {
+            let href = $("#sortList").val();
+            href = href.replace("Sort", "SearchAndSort");
+            href = href + (`&search=${search}`)
+            return href;
+        }
+    }
+
+    function validateNumber(e) {
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+            // Allow: Ctrl/cmd+A
+            (e.keyCode == 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: Ctrl/cmd+C
+            (e.keyCode == 67 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: Ctrl/cmd+X
+            (e.keyCode == 88 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right
+            (e.keyCode >= 35 && e.keyCode <= 39)) {
+            // let it happen, don't do anything
+            return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+    };
+</script>
+
+<script>
+    $(document).ready(function () {
+        //Sắp xếp
+        let sort = "@ViewBag.Sort";
+        if (sort != '') {
+            $("#sortList option").each(function () {
+                if ($(this).val().includes(sort)) {
+                    $(this).attr('selected', 'selected');
+                    return;
+                }
+            });
+        }
+
+        //Keydown event
+        $("#item-them-dienthoai").keydown(validateNumber);
+        $("#item-them-cmnd").keydown(validateNumber);
+        $("#item-sua-dienthoai").keydown(validateNumber);
+        $("#item-sua-cmnd").keydown(validateNumber);
+    });
+
+    $("#btnThemTaiKhoan").click(function () {
+        let loainguoidung = $("#item-them-loainguoidung option:selected").text();
+        if (loainguoidung == "Thương nhân") {
+            $("#item-them-tenshop").attr('required', true);
+            $("#item-them-cmnd").attr('required', true);
+        }
+        if (loainguoidung == "Khách hàng") {
+            $("#item-them-tenshop").attr('required', false);
+            $("#item-them-cmnd").attr('required', false);
+        }
+    });
+
+    $(".btnSuaTaiKhoan").click(function () {
+        let tendangnhap = $(this).closest('tr').find('.item-tendangnhap').text();
+        let ten = $(this).closest('tr').find('.item-ten').text();
+        let tenshop = $(this).closest('tr').find('.item-tenshop').text();
+        let email = $(this).closest('tr').find('.item-email').text();
+        let dienthoai = $(this).closest('tr').find('.item-dienthoai').text();
+        let cmnd = $(this).closest('tr').find('.item-cmnd').text();
+        let loainguoidung = $(this).closest('tr').find('.item-loainguoidung').text();
+
+        if(loainguoidung == "Khách hàng")
+        {
+            $("#item-sua-tenshop").attr('readonly', true);
+        }
+        else
+        {
+            $("#item-sua-tenshop").attr('readonly', false);
+        }
+
+        $("#item-sua-tendangnhap").val(tendangnhap.trim());
+        $("#item-sua-ten").val(ten.trim());
+        $("#item-sua-tenshop").val(tenshop.trim());
+        $("#item-sua-email").val(email.trim());
+        $("#item-sua-dienthoai").val(dienthoai.trim());
+        $("#item-sua-cmnd").val(cmnd.trim());
+    });
+
+    $(".pageNumber").click(function () {
+        //Get addtional href
+        let sort = $("#sortList").val();
+        let search = "@ViewBag.Search";
+        //Href
+        var $link = $('.pageNumber');
+        var href = $link.attr('href').split('/');
+        if (sort != null && sort != '') {
+            sort = sort.substring(sort.lastIndexOf('=') + 1, sort.length);
+            href.push('&sortorder=' + sort); //here you set your new asp-route-pagenumber value
+        }
+        if (search != null && search != '') {
+            href.push('&search=' + search); //here you set your new asp-route-pagenumber value
+        }
+        href = href.join('/');
+        href = href.toString().replace(/\/&/g, '&');
+        $link.attr('href', href);
+    });
+
+    $(".btnCanhBao").click(function () {
+        $.ajax({
+            url: "/Webmaster/TaiKhoan/CanhCao",
+            type: "get",
+            success: function (data) {
+                $("#canhbaoModal-body").html(data);
+            },
+            error: function (data) {
+                alert("Error: " + data);
+            }
+        });
+    });
+</script>

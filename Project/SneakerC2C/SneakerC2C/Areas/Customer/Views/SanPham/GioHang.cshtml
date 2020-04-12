@@ -1,0 +1,590 @@
+﻿@model IEnumerable<Models.Database.GioHang>
+
+@using Microsoft.AspNetCore.Http;
+@using Microsoft.AspNetCore.Mvc;
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "GioHang";
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+}
+@if (Model != null)
+{
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>SNKRX - Giỏ Hàng</title>
+        <!--/tags -->
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="keywords" content="Elite Shoppy Responsive web template, Bootstrap Web Templates, Flat Web Templates, Android Compatible web template,
+Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, SonyEricsson, Motorola web design" />
+        <script type="application/x-javascript">
+            addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false);
+                   function hideURLbar(){ window.scrollTo(0,1); } </script>
+        <!--//tags -->
+        <link href="~/maintemplate/css/bootstrap.css" rel="stylesheet" type="text/css" media="all" />
+        <link href="~/maintemplate/css/style.css" rel="stylesheet" type="text/css" media="all" />
+        <link href="~/maintemplate/css/font-awesome.css" rel="stylesheet">
+        <link href="~/maintemplate/css/easy-responsive-tabs.css" rel='stylesheet' type='text/css' />
+        <link href="~/css/custom.css" rel="stylesheet" />
+        <link href="~/maintemplate/css/fix.css" rel="stylesheet" type='text/css' />
+        <!-- //for bootstrap working -->
+        <link href="//fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i,800" rel="stylesheet">
+        <link href='//fonts.googleapis.com/css?family=Lato:400,100,100italic,300,300italic,400italic,700,900,900italic,700italic' rel='stylesheet' type='text/css'>
+    </head>
+    <body>
+        @*<div class="container-fluid bg_header_knb">
+                <div class="container">
+                    <div class="icon_header_knb">
+                        <i class="fa fa-shopping-bag"></i>
+                    </div>
+                    <div class="logo_header_knb">
+                        <a asp-area="Customer" asp-controller="Home" asp-action="Index">
+                            <h4><span>Trang Chủ</span></h4>
+                        </a>
+                        <a href="#">
+                            <i class="fa fa-angle-right"></i>
+                            <h4>Giỏ Hàng</h4>
+                        </a>
+                    </div>
+                    @if (Context.Session.GetString("TenDangNhap") != null)
+                    {
+                        <div class="user_merchant">
+                            <ul>
+                                <li><i class="fa fa-user"></i></li>
+                                <li>@Context.Session.GetString("TenDangNhap")</li>
+                                <li class="gach_khoangcach">|</li>
+                                <a asp-area="Customer" asp-controller="Authentication" asp-action="LogOut">
+                                    <li><i class="fa fa-sign-out"></i></li>
+                                    <li>Đăng Xuất</li>
+                                </a>
+                            </ul>
+                        </div>
+                    }
+                </div>
+            </div>*@
+        <div class="container-fluid bg_giohang">
+            <div class="container">
+                <div class="header_giohang">
+                    <div class="checkbox_giohang">
+                        <div class="checkboxFive">
+                            <input type="checkbox" id="c1" name="" />
+                            <label for="c1"></label>
+                        </div>
+                    </div>
+                    <div class="sanpham_giohang">
+                        <h5>Sản Phẩm</h5>
+                    </div>
+                    <div class="dongia_giohang">
+                        <h5>Đơn Giá</h5>
+                    </div>
+                    <div class="soluong_giohang">
+                        <h5>Số Lượng</h5>
+                    </div>
+                    <div class="thanhtien_giohang">
+                        <h5>Thành Tiền</h5>
+                    </div>
+                    <div class="thaotac_giohang">
+                        <h5>Thao Tác</h5>
+                    </div>
+                </div>
+                @{
+
+                    string idtaikhoan = "";
+                }
+                @foreach (var item in Model)
+                {
+                    string idtaikhoantemp = item.IdSizeSanPhamNavigation.IdSanPhamNavigation.IdTaiKhoan.ToString();
+                    @if (idtaikhoantemp != idtaikhoan)
+                    {
+                        <br />
+                        <div class="cart_theoshop">
+                            <div class="cart_theoshop_header">
+                                <div class="checkbox_giohang">
+                                    <div class="checkboxFive">
+                                        <input type="checkbox" id="c2" name="" />
+                                        <label for="c2"></label>
+                                    </div>
+                                </div>
+                                <div class="sanpham_giohang">
+                                    <a href="#">
+                                        <i class="fa fa-bank"></i>
+                                        <h5>@item.IdSizeSanPhamNavigation.IdSanPhamNavigation.IdTaiKhoanNavigation.TenShop</h5>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        idtaikhoan = idtaikhoantemp;
+                    }
+                    <div class="cart_theoshop_item">
+                        <div class="checkbox_giohang">
+                            <div class="checkboxFive">
+                                <input type="checkbox" id="c3" name="" />
+                                <label for="c3"></label>
+                            </div>
+                        </div>
+                        <div class="sanpham_giohang">
+                            <input type="text" value="@item.IdSizeSanPham" class="txt-id-sanpham" hidden readonly />
+                            <div class="hinh_sanpham_giohang" style="background-image:url(/Hinh/SanPham/@item.IdSizeSanPhamNavigation.IdSanPhamNavigation.Hinh);"></div>
+                            <div class="form_ten_sp_giohang">
+                                <h5>
+                                    <a asp-area="Customer" asp-controller="SanPham" asp-action="Index" asp-route-id="@item.IdSizeSanPhamNavigation.IdSanPham" class="ten_sp_giohang">@item.IdSizeSanPhamNavigation.IdSanPhamNavigation.TenSanPham (Size: @item.IdSizeSanPhamNavigation.Size)</a>
+                                </h5>
+                            </div>
+                        </div>
+                        <div class="dongia_giohang">
+                            @if (item.IdSizeSanPhamNavigation.IdSanPhamNavigation.GiamGia != null && item.IdSizeSanPhamNavigation.IdSanPhamNavigation.GiamGia != 0)
+                            {
+                                double gia = item.IdSizeSanPhamNavigation.IdSanPhamNavigation.Gia * (100 - item.IdSizeSanPhamNavigation.IdSanPhamNavigation.GiamGia) / 100 ?? 0;
+                                <h5><del>@item.IdSizeSanPhamNavigation.IdSanPhamNavigation.Gia.Value.ToString("#,###") đ</del></h5><h5 class="realPrice"> @gia.ToString("#,###") đ</h5>
+                            }
+                            else
+                            {
+                                <h5 class="realPrice">@item.IdSizeSanPhamNavigation.IdSanPhamNavigation.Gia.Value.ToString("#,###") đ</h5>
+                            }
+                        </div>
+                        <div class="soluong_giohang">
+                            <input class="txt-soluong-sizesanpham" type="text" value="@item.IdSizeSanPhamNavigation.SoLuong" hidden readonly/>
+                            <div class="tang_soluong">
+                                <button class="button_tanggiam_sl btnGiamSoLuong">
+                                    <i class="fa fa-minus"></i>
+                                </button>
+                                <input class="soluong" type="text" value="@item.SoLuong">
+                                <button class="button_tanggiam_sl btnTangSoLuong">
+                                    <i class="fa fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="thanhtien_giohang">
+                            @if (item.IdSizeSanPhamNavigation.IdSanPhamNavigation.GiamGia != null && item.IdSizeSanPhamNavigation.IdSanPhamNavigation.GiamGia != 0)
+                            {
+                                double gia = item.IdSizeSanPhamNavigation.IdSanPhamNavigation.Gia * (100 - item.IdSizeSanPhamNavigation.IdSanPhamNavigation.GiamGia) / 100 ?? 0;
+                                <h5>@gia.ToString("#,###") đ</h5>
+                            }
+                            else
+                            {
+                                <h5>@item.IdSizeSanPhamNavigation.IdSanPhamNavigation.Gia.Value.ToString("#,###") đ</h5>
+                            }
+                        </div>
+                        <div class="thaotac_giohang">
+                            <form asp-area="Customer" asp-controller="TaiKhoan" asp-action="DeleteFromCart" class="frmDeleteFromCart" style="width: 100%;">
+                                <input type="text" class="txtIdSizeXoa" name="idsizesanpham" value="@item.IdSizeSanPham" readonly hidden />
+                                <button class="button-xoa" type="submit">Xoá</button>
+                                @*<input type="submit" value="Xoá" class="button-xoa">*@
+                            </form>
+                        </div>
+                    </div>
+                }
+                <div class="form_nen"></div>
+                <div class="form_tongtien z-index-giohang">
+                    <div class="checkbox_giohang checkbox_fix">
+                        <div class="checkboxFive">
+                            <input type="checkbox" id="c8" name="" />
+                            <label for="c8"></label>
+                        </div>
+                    </div>
+                    <div class="sanpham_giohang chon_all">
+                        <h5>Chọn tất cả sản phẩm</h5>
+                    </div>
+                    <div class="tong_giatien">
+                        <h4>Tổng tiền hàng: </h4>
+                        <h2>₫2.000.000</h2>
+                    </div>
+                    <div class="button-muahang">
+                        <button class="btn-muahang" id="btnMuaHang">Mua Hàng</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal1 -->
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body modal-body-sub_agile">
+                        <div class="col-md-8 modal_body_left modal_body_left1">
+                            <h3 class="agileinfo_sign">Đăng Nhập</h3>
+                            <form asp-area="Customer" asp-controller="Authentication" asp-action="LogIn" method="post">
+                                <div class="styled-input agile-styled-input-top">
+                                    <input type="text" name="tendangnhap" required oninvalid="this.setCustomValidity('Tên đăng nhập không được để trống')" onchange="this.setCustomValidity('')">
+                                    <label>Tên đăng nhập</label>
+                                    <span></span>
+                                </div>
+                                <div class="styled-input">
+                                    <input type="password" name="matkhau" required oninvalid="this.setCustomValidity('Mật khẩu không được để trống')" onchange="this.setCustomValidity('')">
+                                    <label>Mật khẩu</label>
+                                    <span></span>
+                                </div>
+                                <input type="submit" value="Đăng Nhập">
+                            </form>
+                            <ul class="social-nav model-3d-0 footer-social w3_agile_social top_agile_third">
+                                <li>
+                                    <a href="#" class="facebook">
+                                        <div class="front"><i class="fa fa-facebook" aria-hidden="true"></i></div>
+                                        <div class="back"><i class="fa fa-facebook" aria-hidden="true"></i></div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" class="twitter">
+                                        <div class="front"><i class="fa fa-twitter" aria-hidden="true"></i></div>
+                                        <div class="back"><i class="fa fa-twitter" aria-hidden="true"></i></div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" class="instagram">
+                                        <div class="front"><i class="fa fa-instagram" aria-hidden="true"></i></div>
+                                        <div class="back"><i class="fa fa-instagram" aria-hidden="true"></i></div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" class="pinterest">
+                                        <div class="front"><i class="fa fa-linkedin" aria-hidden="true"></i></div>
+                                        <div class="back"><i class="fa fa-linkedin" aria-hidden="true"></i></div>
+                                    </a>
+                                </li>
+                            </ul>
+                            <div class="clearfix"></div>
+                            <p><a href="#" data-toggle="modal" data-target="#myModal2"> Chưa có tài khoản đăng nhập?</a></p>
+                            <p><a href="#" data-toggle="modal" data-target="#forgotModal"> Quên mật khẩu?</a></p>
+                        </div>
+                        <div class="col-md-4 modal_body_right modal_body_right1">
+                            <img src="~/maintemplate/images/log_pic.jpg" alt=" " />
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+                <!-- //Modal content-->
+            </div>
+        </div>
+        <!-- //Modal1 -->
+        <!-- Modal2 -->
+        <div class="modal fade" id="myModal2" tabindex="-1" role="dialog">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header modal-header-margin">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body modal-body-sub_agile">
+                        <div class="col-md-8 modal_body_left modal_body_left1">
+                            <h3 class="agileinfo_sign">Đăng Ký</h3>
+                            <form asp-area="Customer" asp-controller="TaiKhoan" asp-action="CreateTaiKhoan" method="post">
+                                <div class="styled-input agile-styled-input-top">
+                                    <input type="text" name="tendangnhap" pattern=".{8,}" required oninvalid="this.setCustomValidity('Tên đăng nhập chứa ít nhất 8 ký tự')" onchange="this.setCustomValidity('')">
+                                    <label>Tên đăng nhập</label>
+                                    <span></span>
+                                </div>
+                                <div class="styled-input">
+                                    <input type="password" name="matkhau" pattern=".{8,}" required oninvalid="this.setCustomValidity('Mật khẩu chứa ít nhất 8 ký tự')" onchange="this.setCustomValidity('')">
+                                    <label>Mật khẩu</label>
+                                    <span></span>
+                                </div>
+                                <div class="styled-input">
+                                    <input type="password" name="confirmmatkhau" pattern=".{8,}" required oninvalid="this.setCustomValidity('Mật khẩu chứa ít nhất 8 ký tự')" onchange="this.setCustomValidity('')">
+                                    <label>Xác nhận mật khẩu</label>
+                                    <span></span>
+                                </div>
+                                <div class="styled-input">
+                                    <input type="text" name="ten" required oninvalid="this.setCustomValidity('Cần điền vào họ tên')" onchange="this.setCustomValidity('')">
+                                    <label>Tên</label>
+                                    <span></span>
+                                </div>
+                                <div class="styled-input">
+                                    <input type="email" name="email" required oninvalid="this.setCustomValidity('Email không đúng định dạng')" onchange="this.setCustomValidity('')">
+                                    <label>Email</label>
+                                    <span></span>
+                                </div>
+                                <div class="styled-input">
+                                    <input type="text" name="dienthoai" id="txtDienThoai" pattern=".{10,12}" required oninvalid="this.setCustomValidity('Số điện thoại chứa 10 - 12 ký tự')" onchange="this.setCustomValidity('')">
+                                    <label>Số điện thoại</label>
+                                    <span></span>
+                                </div>
+                                <div class="checkbox">
+                                    <input type="checkbox" id="chkDangKy" required oninvalid="this.setCustomValidity('Để đồng ý cần phải đồng ý với các điều khoản')" onchange="this.setCustomValidity('')"><p><a>Tôi đã đồng ý với các điều khoản khi bấm đăng ký</a></p>
+                                </div>
+                                <input type="submit" value="Đăng Ký">
+                                <br />
+                            </form>
+
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="col-md-4 modal_body_right modal_body_right1">
+                            <img src="~/maintemplate/images/log_pic.jpg" alt=" " />
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+                <!-- //Modal content-->
+            </div>
+        </div>
+        <!-- //Modal2 -->
+        <!--KHong dung vao-->
+        <form asp-area="Customer" asp-controller="SanPham" asp-action="GioHang" asp-route-tendangnhap="@Context.Session.GetString("TenDangNhap")" method="post" id="frmSubmit" class="last">
+            <input id="local-storage" type="text" value="" name="cart" hidden readonly />
+            <button class="w3view-cart" type="submit" id="btnCart" hidden><i class="fa fa-cart-arrow-down" aria-hidden="true" hidden></i></button>
+        </form>
+
+        <!--Khong dung-->
+        <form asp-area="Customer" asp-controller="TaiKhoan" asp-action="DeleteFromCart" id="frmDeleteFromCart2" style="width: 100%;">
+            <input type="text" id="txtDeleteFromCart2" name="idsizesanpham" readonly hidden />
+            <button class="button-xoa" type="submit" hidden>Xoá</button>
+            @*<input type="submit" value="Xoá" class="button-xoa">*@
+        </form>
+    </body>
+</html>
+
+<script type="text/javascript" src="~/maintemplate/js/jquery-2.1.4.min.js"></script>
+<!-- for bootstrap working -->
+<script type="text/javascript" src="~/maintemplate/js/bootstrap.js"></script>
+
+<script>
+    function validateNumber(e) {
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+            // Allow: Ctrl/cmd+A
+            (e.keyCode == 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: Ctrl/cmd+C
+            (e.keyCode == 67 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: Ctrl/cmd+X
+            (e.keyCode == 88 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right
+            (e.keyCode >= 35 && e.keyCode <= 39)) {
+            // let it happen, don't do anything
+            return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+    };
+
+    function getTotalPrice() {
+        let totalPrice = 0;
+        let row = 0;
+
+        $(".thanhtien_giohang h5").each(function () {
+            if (row == 0) {
+                row++;
+            }
+            else {
+                let pricetext = $(this).text().trim();
+                pricetext = pricetext.replace(/\,/g, '');
+                pricetext = pricetext.substring(0, pricetext.indexOf(' '));
+
+                let price = parseFloat(pricetext);
+                totalPrice += price;
+            }
+        });
+        $(".tong_giatien h2").text(totalPrice.toLocaleString('en-EN') + ' đ');
+    }
+
+    function getEachPrice() {
+        let eachPrice = 0;
+
+        $(".realPrice").each(function () {
+            let pricetext = $(this).text().trim();
+            pricetext = pricetext.replace(/\,/g, '');
+            pricetext = pricetext.substring(0, pricetext.indexOf(' '));
+
+            let price = parseFloat(pricetext);
+            let quantity = $(this).closest('.cart_theoshop_item').find('.soluong').val();
+            eachPrice = price * quantity;
+            $(this).closest('.cart_theoshop_item').find('.thanhtien_giohang').html(`<h5>${eachPrice.toLocaleString('en-EN')} đ</h5>`);
+        });
+    }
+
+    function AddQuantity(idsizesanpham, quantity) {
+        let tendangnhap = "@Context.Session.GetString("TenDangNhap")";
+        $.ajax({
+            url: "/Customer/SanPham/AddQuantity",
+            type: "post",
+            data: { "tendangnhap": tendangnhap, "idsizesanpham": idsizesanpham, "quantity": quantity },
+            error: function (data) {
+                alert("Error: " + data);
+            },
+            async: false
+            //Nhớ xài async hoặc dùng 1 request chứa tất cả dữ liệu, k là bị DDoS
+        });
+    }
+</script>
+
+<script>
+    $(".soluong").keydown(validateNumber);
+
+    $(document).ready(function () {
+        getEachPrice();
+        getTotalPrice();
+        //Clear localStorage nếu đã đăng nhập
+        let tendangnhap = "@Context.Session.GetString("TenDangNhap")";
+        if (tendangnhap != null && tendangnhap != "") {
+            localStorage.clear();
+        }
+    });
+
+    $(".soluong").change(function () {
+        let pricetext = $(this).closest('.cart_theoshop_item').find('.dongia_giohang').text().trim();
+        pricetext = pricetext.replace(/\,/g, '');
+        pricetext = pricetext.substring(0, pricetext.indexOf(' '));
+
+        let price = parseFloat(pricetext);
+        let quantity = parseInt($(this).val());
+        let totalPrice = price * quantity;
+
+        $(this).closest('.cart_theoshop_item').find('.thanhtien_giohang').html(`<h5>${totalPrice.toLocaleString('en-EN')} đ</h5>`);
+        getTotalPrice();
+
+        let idsizesanpham = $(this).closest('.cart_theoshop_item').find('.txt-id-sanpham').val();
+        AddQuantity(idsizesanpham, quantity);
+    });
+
+    $(".soluong").keyup(function () {
+        let totalPrice = 0;
+        let quantity = 0;
+
+        let pricetext = $(this).closest('.cart_theoshop_item').find('.dongia_giohang').text().trim();
+        pricetext = pricetext.replace(/\,/g, '');
+        pricetext = pricetext.substring(0, pricetext.indexOf(' '));
+
+        if ($(this).val() == null || $(this).val() == '') {
+            let price = parseFloat(pricetext);
+            quantity = 0;
+            totalPrice = price * quantity;
+            $(this).val(0);
+        }
+        else {
+            let price = parseFloat(pricetext);
+            quantity = parseInt($(this).val());
+            totalPrice = price * quantity;
+
+        }
+
+        $(this).closest('.cart_theoshop_item').find('.thanhtien_giohang').html(`<h5>${totalPrice.toLocaleString('en-EN')} đ</h5>`);
+        getTotalPrice();
+
+        let idsizesanpham = $(this).closest('.cart_theoshop_item').find('.txt-id-sanpham').val();
+        AddQuantity(idsizesanpham, quantity);
+    });
+
+    $(".btnTangSoLuong").click(function () {
+        let maxvalue = $(this).closest('.cart_theoshop_item').find(".txt-soluong-sizesanpham").val();
+        let value = $(this).closest('.cart_theoshop_item').find(".soluong").val();
+        value = parseInt(value) + 1;
+        if (value > maxvalue) {
+            alert(`Số lượng mua lớn hơn số lượng tồn kho (${maxvalue})`);
+        }
+        else {
+            $(this).closest('.cart_theoshop_item').find(".soluong").val(value);
+            //$(".soluong").val(value);
+
+            let pricetext = $(this).closest('.cart_theoshop_item').find('.dongia_giohang').text().trim();
+            pricetext = pricetext.replace(/\,/g, '');
+            pricetext = pricetext.substring(0, pricetext.indexOf(' '));
+
+            let price = parseFloat(pricetext);
+            let quantity = parseInt($(this).closest('.cart_theoshop_item').find(".soluong").val());
+            totalPrice = price * quantity;
+
+            $(this).closest('.cart_theoshop_item').find('.thanhtien_giohang').html(`<h5>${totalPrice.toLocaleString('en-EN')} đ</h5>`);
+            getTotalPrice();
+
+            let idsizesanpham = $(this).closest('.cart_theoshop_item').find('.txt-id-sanpham').val();
+            AddQuantity(idsizesanpham, quantity);    
+        }
+    });
+
+    $(".btnGiamSoLuong").click(function () {
+        let value = $(this).closest('.cart_theoshop_item').find(".soluong").val();
+        value = parseInt(value) - 1;
+        if (value < 1) {
+            value = 1;
+        }
+        $(this).closest('.cart_theoshop_item').find(".soluong").val(value);
+        //$(".soluong").val(value);
+
+        let pricetext = $(this).closest('.cart_theoshop_item').find('.dongia_giohang').text().trim();
+        pricetext = pricetext.replace(/\,/g, '');
+        pricetext = pricetext.substring(0, pricetext.indexOf(' '));
+
+        let price = parseFloat(pricetext);
+        let quantity = parseInt($(this).closest('.cart_theoshop_item').find(".soluong").val());
+        totalPrice = price * quantity;
+
+        $(this).closest('.cart_theoshop_item').find('.thanhtien_giohang').html(`<h5>${totalPrice.toLocaleString('en-EN')} đ</h5>`);
+        getTotalPrice();
+
+        let idsizesanpham = $(this).closest('.cart_theoshop_item').find('.txt-id-sanpham').val();
+        AddQuantity(idsizesanpham, quantity);
+    });
+
+
+    $("#btnMuaHang").click(function(){
+        let tendangnhap = "@Context.Session.GetString("TenDangNhap")";
+        if (tendangnhap == "") {
+            alert("Vui lòng đăng nhập để thanh toán");
+        }
+        else {
+            let tendangnhap = "@Context.Session.GetString("TenDangNhap")";
+            $.ajax({
+                url: "/Customer/DonHang/CheckDonHang",
+                type: "post",
+                data: { "tendangnhap": tendangnhap },
+                success: function (data) {
+                    if (data == "Đặt hàng thành công") {
+                        window.location.href = `/Customer/DonHang/DatHang?tendangnhap=${tendangnhap}`;
+                        //alert(data);
+                        //CreateDonDatHang();
+                    }
+                    else {
+                        alert(data);
+                    }
+                },
+                error: function (data) {
+                    alert("Error: " + data);
+                },
+                async: false
+                //Nhớ xài async hoặc dùng 1 request chứa tất cả dữ liệu, k là bị DDoS
+            });
+        }
+    });
+
+    $(".frmDeleteFromCart").submit(function(e){
+        e.preventDefault();
+        let idsizesanpham = $(this).closest('.thaotac_giohang').find('.txtIdSizeXoa').val();
+        let tendangnhap = "@Context.Session.GetString("TenDangNhap")";
+        if(tendangnhap == "" || tendangnhap == null)
+        {
+            let item = JSON.parse(localStorage.getItem("Cart"));
+            delete item[idsizesanpham];
+            localStorage.clear();
+            localStorage.setItem("Cart", JSON.stringify(item));
+            $('#local-storage').val(localStorage.getItem("Cart"));
+            $('#frmSubmit').submit();
+        }
+        else
+        {
+            $("#txtDeleteFromCart2").val(idsizesanpham);
+            $("#frmDeleteFromCart2").submit();
+        }
+    });
+</script>
+}
+else
+{
+<script type="text/javascript" src="~/maintemplate/js/jquery-2.1.4.min.js"></script>
+<form asp-area="Customer" asp-controller="SanPham" asp-action="GioHang" asp-route-tendangnhap="@Context.Session.GetString("TenDangNhap")" method="post" id="frmSubmit" class="last">
+    <input id="local-storage" type="hidden" value="" name="cart" />
+    <button class="w3view-cart" type="submit" id="btnCart"><i class="fa fa-cart-arrow-down" aria-hidden="true" hidden></i></button>
+</form>
+<script>
+    $(document).ready(function () {
+        $('#local-storage').val(localStorage.getItem("Cart"));
+        $('#frmSubmit').submit();
+    });
+</script>
+}

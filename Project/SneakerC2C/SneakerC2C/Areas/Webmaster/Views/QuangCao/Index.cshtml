@@ -1,0 +1,661 @@
+﻿@model IEnumerable<Models.Database.QuangCao>
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+
+<h1 class="page-header">DANH SÁCH QUẢNG CÁO</h1>
+<hr>
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <!-- Search form -->
+        <div class="row">
+            <!-------------------------------------------------------- INSERT ---------------------------------------------------------->
+            <div class="col-lg-1">
+                <button class="btn btn-primary" data-toggle="modal" data-target="#themModal">Thêm</button>
+            </div>
+            <!-------------------------------------------------------- SEARCH CATEGORY ---------------------------------------------------------->
+            <div class="col-lg-2">
+                <div class="form-group">
+                    <select class="form-control" id="sortList" onchange="window.location.href = SearchAndSort()">
+                        <option selected disabled>Sắp xếp theo</option>
+                        <option value="/Webmaster/QuangCao/Sort?sortorder=ngaybatdau-asc">Ngày bất đầu (Tăng dần)</option>
+                        <option value="/Webmaster/QuangCao/Sort?sortorder=ngaybatdau-desc">Ngày bất đầu (Giảm dần)</option>
+                        <option value="/Webmaster/QuangCao/Sort?sortorder=ngayketthuc-asc">Ngày kết thúc (Tăng dần)</option>
+                        <option value="/Webmaster/QuangCao/Sort?sortorder=ngayketthuc-desc">Ngày kết thúc (Giảm dần)</option>
+                        <option value="/Webmaster/QuangCao/Sort?sortorder=goiquangcao-az">Mã gói quảng cáo (A-Z)</option>
+                        <option value="/Webmaster/QuangCao/Sort?sortorder=goiquangcao-za">Gói quảng cáo (Z-A)</option>
+                        <option value="/Webmaster/QuangCao/Sort?sortorder=taikhoan-az">Tên tài khoản (A-Z)</option>
+                        <option value="/Webmaster/QuangCao/Sort?sortorder=taikhoan-za">Tên tài khoản (Z-A)</option>
+                    </select>
+                </div>
+            </div>
+            <!-------------------------------------------------------- SEARCH BAR ---------------------------------------------------------->
+            <div class="col-lg-3">
+                <form asp-controller="QuangCao" asp-action="Search" method="get">
+                    <div class="input-group custom-search-form">
+                        <input type="text" class="form-control" id="searchList" placeholder="Tìm kiếm..." name="search">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="submit">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </span>
+
+                    </div>
+                </form>
+            </div>
+
+            <!-------------------------------------------------------- MAIN TABLE ---------------------------------------------------------->
+        </div>
+        <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Mã</th>
+                    <th>Mã Gói Quảng Cáo</th>
+                    <th>Tên Tài Khoản</th>
+                    <th>Hình</th>
+                    <th>Đường dẫn</th>
+                    <th>Ngày bắt đầu</th>
+                    <th>Ngày kết thúc</th>
+                    <th>Chú thích</th>
+                    <th>Chức năng</th>
+                </tr>
+            </thead>
+            <tbody class="body-content">
+                @foreach (var item in Model)
+                {
+                <tr class="odd gradeX">
+                    <td class="item-ma">@item.MaQuangCao</td>
+                    <td class="item-goiquangcao">@item.IdGoiQuangCaoNavigation.MaGoiQuangCao</td>
+                    <td class="item-taikhoan">@item.IdTaiKhoanNavigation.TenDangNhap</td>
+                    <td class="item-hinh"><img src="@Url.Content("~/Hinh/quangcao/" + @item.Hinh)" width="200" height="200"/></td>
+                    @*<td class="item-hinh"><div style="background-image:@Url.Content("~/Hinh/quangcao/" + @item.Hinh)"></div></td>*@
+                    <td class="item-duongdan">@item.DuongDan</td>
+                    <td class="item-ngaybatdau">@item.NgayBatDau</td>
+                    <td class="item-ngayketthuc">@item.NgayKetThuc</td>
+                    <td class="item-chuthich">@item.ChuThich</td>
+
+                    <td>
+                        @if (item.TinhTrang == "Không khoá")
+                        {
+                            <button class="btn btn-primary btnSuaGoi" type="button" data-toggle="modal" data-target="#suaModal">Sửa</button>
+
+                            <a asp-controller="QuangCao" asp-action="LockQuangCao" asp-route-maquangcao="@item.MaQuangCao" class="btn btn-danger">Khoá</a>
+                            <a asp-controller="QuangCao" asp-action="LockQuangCao2" asp-route-maquangcao="@item.MaQuangCao" class="btn btn-danger">Huỷ</a>
+                        }
+                        else
+                        {
+                            <button class="btn btn-primary  btnSuaGoi" type="button" data-toggle="modal" data-target="#suaModal" disabled>Sửa</button>
+
+
+                        }
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+        <!-- /.table-responsive -->
+        <div class="col-sm-12 col-md-7">
+            <div class="dataTables_paginate paging_simple_numbers" id="dataTable_paginate">
+                <ul class="pagination" style="margin: 0 auto;">
+                    @if (ViewBag.TrangHienTai == 1)
+                    {
+                        <li class="paginate_button page-item previous disabled" id="dataTable_previous">
+                            <a href="#" aria-controls="dataTable" data-dt-idx="0" tabindex="0" class="page-link">Trước</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="paginate_button page-item previous" id="dataTable_previous">
+                            @switch (ViewBag.TrangThai)
+                            {
+                                case "index":
+                                    <a asp-controller="QuangCao" asp-action="Index" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai - 1)" aria-controls="dataTable" data-dt-idx="0" tabindex="0" class="page-link pageNumber">Trước</a>
+                                    break;
+                                case "sort":
+                                    <a asp-controller="QuangCao" asp-action="Sort" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai - 1)" aria-controls="dataTable" data-dt-idx="0" tabindex="0" class="page-link pageNumber">Trước</a>
+                                    break;
+                                case "search":
+                                    <a asp-controller="QuangCao" asp-action="Search" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai - 1)" aria-controls="dataTable" data-dt-idx="0" tabindex="0" class="page-link pageNumber">Trước</a>
+                                    break;
+                                case "searchandsort":
+                                    <a asp-controller="QuangCao" asp-action="SearchAndSort" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai - 1)" aria-controls="dataTable" data-dt-idx="0" tabindex="0" class="page-link pageNumber">Trước</a>
+                                    break;
+                            }
+                        </li>
+                    }
+                    @for (int i = 1; i <= ViewBag.TongTrang; i++)
+                    {
+                        if (i > 5)
+                        {
+                            <li class="paginate_button page-item" disabled><a class="page-link" aria-controls="dataTable" data-dt-idx="0" tabindex="0" href="#">...</a></li>
+                            <li class="paginate_button page-item">
+                                @switch (ViewBag.TrangThai)
+                                {
+                                    case "index":
+                                        <a asp-controller="QuangCao" asp-action="Index" asp-route-pagenumber="@Html.Raw(ViewBag.TongTrang)" class="pageNumber">@ViewBag.TongTrang</a>
+                                        break;
+                                    case "sort":
+                                        <a asp-controller="QuangCao" asp-action="Sort" asp-route-pagenumber="@Html.Raw(ViewBag.TongTrang)" class="pageNumber">@ViewBag.TongTrang</a>
+                                        break;
+                                    case "search":
+                                        <a asp-controller="QuangCao" asp-action="Search" asp-route-pagenumber="@Html.Raw(ViewBag.TongTrang)" class="pageNumber">@ViewBag.TongTrang</a>
+                                        break;
+                                    case "searchandsort":
+                                        <a asp-controller="QuangCao" asp-action="SearchAndSort" asp-route-pagenumber="@Html.Raw(ViewBag.TongTrang)" class="pageNumber">@ViewBag.TongTrang</a>
+                                        break;
+                                }
+                            </li>
+                            break;
+                        }
+                        else
+                        {
+                            if (i == ViewBag.TrangHienTai)
+                            {
+                                <li class="paginate_button page-item active"><a href="#" class="page-link" aria-controls="dataTable" data-dt-idx="2" tabindex="0">@i</a></li>
+                            }
+                            else
+                            {
+                                <li class="paginate_button page-item" aria-controls="dataTables-example" tabindex="0">
+                                    @switch (ViewBag.TrangThai)
+                                    {
+                                        case "index":
+                                            <a asp-controller="QuangCao" asp-action="Index" asp-route-pagenumber="@i" class="page-link pageNumber" aria-controls="dataTable" data-dt-idx="3" tabindex="0">@i</a>
+                                            break;
+                                        case "sort":
+                                            <a asp-controller="QuangCao" asp-action="Sort" asp-route-pagenumber="@i" class="page-link pageNumber" aria-controls="dataTable" data-dt-idx="3" tabindex="0">@i</a>
+                                            break;
+                                        case "search":
+                                            <a asp-controller="QuangCao" asp-action="Search" asp-route-pagenumber="@i" class="page-link pageNumber" aria-controls="dataTable" data-dt-idx="3" tabindex="0">@i</a>
+                                            break;
+                                        case "searchandsort":
+                                            <a asp-controller="QuangCao" asp-action="SearchAndSort" asp-route-pagenumber="@i" class="page-link pageNumber" aria-controls="dataTable" data-dt-idx="3" tabindex="0">@i</a>
+                                            break;
+                                    }
+                                </li>
+                            }
+                        }
+                    }
+                    @if (ViewBag.TrangHienTai == ViewBag.TongTrang)
+                    {
+                        <li class="paginate_button page-item next disabled" id="dataTable_next"><a class="page-link" aria-controls="dataTable" data-dt-idx="7" tabindex="0" href="#">Tiếp</a></li>
+                    }
+                    else
+                    {
+                        <li class="paginate_button page-item next" id="dataTable_next">
+                            @switch (ViewBag.TrangThai)
+                            {
+                                case "index":
+                                    <a asp-controller="QuangCao" asp-action="Index" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai + 1)" aria-controls="dataTable" data-dt-idx="7" tabindex="0" class="page-link pageNumber">Tiếp</a>
+                                    break;
+                                case "sort":
+                                    <a asp-controller="QuangCao" asp-action="Sort" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai + 1)" aria-controls="dataTable" data-dt-idx="7" tabindex="0" class="page-link pageNumber">Tiếp</a>
+                                    break;
+                                case "search":
+                                    <a asp-controller="QuangCao" asp-action="Search" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai + 1)" aria-controls="dataTable" data-dt-idx="7" tabindex="0" class="page-link pageNumber">Tiếp</a>
+                                    break;
+                                case "searchandsort":
+                                    <a asp-controller="QuangCao" asp-action="SearchAndSort" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai + 1)" aria-controls="dataTable" data-dt-idx="7" tabindex="0" class="page-link pageNumber">Tiếp</a>
+                                    break;
+                            }
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+        </div>
+    </div>
+</br>
+        <!-- /.panel-body -->
+        <!-------------------------------------------------------- INSERT MODAL ---------------------------------------------------------->
+
+        <div class="modal fade" id="themModal" role="dialog">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <form asp-controller="QuangCao" asp-action="CreateQuangCao" method="post"  enctype="multipart/form-data">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            @*<button type="button" class="close" data-dismiss="modal">&times;</button>*@
+                            <h4 class="modal-title"><b>Quảng Cáo</b></h4>
+                        </div>
+                        <div class="modal-body">
+                            <p id="them_thongbao_ma" style="color: red;"></p>
+                            @*<div class="form-group">
+                                <label>Mã</label>
+                                <input type="text" class="form-control" id="item_them_ma" name="item_them_ma" required />
+                            </div>*@
+                            <div class="form-group">
+                                <label>Mã Gói</label>
+                                <select class="form-control" id="item_them_goiquangcao" name="item_them_goiquangcao" required onchange="changegoi()">
+                                    @foreach (var item in ViewBag.GoiQuangCao)
+                                    {
+                                        <option value="@item.Id">@item.MaGoiQuangCao</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Tên Vị Trí </label>
+                                <input type="text" class="form-control" id="item_them_tenvitri" name="item_them_tenvitri" disable readonly />
+                            </div>
+                            <div class="form-group">
+                                <label>Thời Lượng</label>
+                                <input type="text" class="form-control" id="item_them_thoiluong" name="item_them_thoiluong" disable readonly />
+                            </div>
+                            <p id="them_thongbao_taikhoan" style="color: red;"></p>
+                            <div class="form-group">
+                                <label>Tài Khoản</label>
+                                <input type="text" class="form-control" id="item_them_taikhoan" name="item_them_taikhoan" required />
+                            </div>
+                            <div class="form-group">
+                                <label>Chọn file hình</label>
+
+                                <input type="file" class="form-control" id="item_them_hinh" name="item_them_hinh" accept='image/*' required />
+
+                            </div>
+                            <div class="form-group">
+                                <label>Chọn đường dẫn</label>
+                                <input type="text" class="form-control" id="item_them_duongdan" name="item_them_duongdan"  />
+                            </div>
+                            <div class="form-group">
+                                <label>Chọn năm bắt đầu</label>
+
+                                <input type="number" class="form-control" id="item_them_nam" name="item_them_nam" required min="@DateTime.Now.Year.ToString()" readonly onchange="changenam()" />
+
+                            </div>
+                            <p id="them_thongbao_thang" style="color: red;"></p>
+                            <div class="form-group">
+                                <label>Chọn tháng bắt đầu</label>
+
+                                <input type="number" class="form-control" id="item_them_thang" name="item_them_thang" max="12" required readonly onchange="changethang()" />
+
+                            </div>
+                            <div class="form-group">
+                                <label>Chọn ngày bắt đầu</label>
+                                <select class="form-control" id="item_them_ngay" name="item_them_ngay" required onchange="changengay()"></select>
+                            </div>
+
+                            @*<div class="form-group">
+            <label>Ngày kết thúc </label>
+            <input type="text" class="form-control" id="item_them_ngayketthuc" name="item_them_ngayketthuc" readonly />
+        </div>*@
+                            <div class="form-group">
+                                <label>Chú thích </label>
+                                <input type="text" class="form-control" id="item_them_chuthich" name="item_them_chuthich" />
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-warning" id="btnThemModal" disabled>Thêm</button>
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">Đóng</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-------------------------------------------------------- UPDATE MODAL ---------------------------------------------------------->
+        <div class="modal fade" id="suaModal" role="dialog">
+           <div class="modal-dialog">
+                <!-- Modal content-->
+                <form asp-controller="QuangCao" asp-action="EditQuangCao" method="post" enctype="multipart/form-data">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            @*<button type="button" class="close" data-dismiss="modal">&times;</button>*@
+                            <h4 class="modal-title"><b>Quảng Cáo</b></h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Mã</label>
+                                <input type="text" class="form-control" id="item_sua_ma" name="item_sua_ma" readonly required>
+                            </div>
+                            <div class="form-group">
+                                <label>Mã Gói</label>
+                                <input type="text" class="form-control" id="item_sua_goiquangcao" name="item_sua_goiquangcao" readonly required>
+                            </div>
+                            <div class="form-group">
+                                <label>Tài Khoản</label>
+                                <input type="text" class="form-control" id="item_sua_taikhoan" name="item_sua_taikhoan" readonly required />
+                            </div>
+                            <div class="form-group">
+                                <label>Chọn file hình</label>
+
+                                <input type="file" class="form-control" id="item_sua_hinh" name="item_sua_hinh" accept='image/*' />
+
+                            </div>
+                            <div class="form-group">
+                                <label>Chọn đường dẫn</label>
+                                <input type="text" class="form-control" id="item_sua_duongdan" name="item_sua_duongdan" />
+                            </div>
+                            <div class="form-group">
+                                <label>Chú Thích </label>
+                                <input type="text" class="form-control" id="item_sua_chuthich" name="item_sua_chuthich" />
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-warning">Sửa</button>
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">Đóng</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+       
+    </div>
+        @if (ViewBag.ThongBao != null)
+        {
+            <script>
+        alert("@Html.Raw(ViewBag.ThongBao)");
+            </script>
+        }
+
+
+ <script>
+     document.getElementById('item_them_goiquangcao').selectedIndex = "-1";
+    function SearchAndSort() {
+        let search = "@ViewBag.Search";
+        if (search == null || search == '') {
+            return $("#sortList").val();
+        }
+        else {
+            let href = $("#sortList").val();
+            href = href.replace("Sort", "SearchAndSort");
+            href = href + (`&search=${search}`)
+            return href;
+        }
+        $("#item_them_thoiluong").keydown(validateNumber);
+        $("#item_sua_thoiluong").keydown(validateNumber);
+    }
+
+    function validateNumber(e) {
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+            // Allow: Ctrl/cmd+A
+            (e.keyCode == 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: Ctrl/cmd+C
+            (e.keyCode == 67 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: Ctrl/cmd+X
+            (e.keyCode == 88 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right
+            (e.keyCode >= 35 && e.keyCode <= 39)) {
+            // let it happen, don't do anything
+            return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+    };
+        </script>
+
+        <script>
+            
+    $(document).ready(function () {
+        //Sắp xếp
+        let sort = "@ViewBag.Sort";
+        if (sort != '') {
+            $("#sortList option").each(function () {
+                if ($(this).val().includes(sort)) {
+                    $(this).attr('selected', 'selected');
+                    return;
+                }
+            });
+        }
+    });
+
+    $(".btnSuaGoi").click(function () {
+        let ma = $(this).closest('tr').find('.item-ma').text();
+        let goiquangcao = $(this).closest('tr').find('.item-goiquangcao').text();
+        
+        let taikhoan = $(this).closest('tr').find('.item-taikhoan').text();
+        let chuthich = $(this).closest('tr').find('.item-chuthich').text();
+
+       
+        $("#item_sua_ma").val(ma.trim());
+        document.getElementById("item_sua_goiquangcao").value = goiquangcao;
+        document.getElementById("item_sua_taikhoan").value = taikhoan;
+      
+        $("#item_sua_chuthich").val(chuthich.trim());
+
+    });
+
+    $(".pageNumber").click(function () {
+        //Get addtional href
+        let sort = $("#sortList").val();
+        let search = "@ViewBag.Search";
+        //Href
+        var $link = $('.pageNumber');
+        var href = $link.attr('href').split('/');
+        if (sort != null && sort != '') {
+            sort = sort.substring(sort.lastIndexOf('=') + 1, sort.length);
+            href.push('&sortorder=' + sort); //here you set your new asp-route-pagenumber value
+        }
+        if (search != null && search != '') {
+            href.push('&search=' + search); //here you set your new asp-route-pagenumber value
+        }
+        href = href.join('/');
+        href = href.toString().replace(/\/&/g, '&');
+        $link.attr('href', href);
+    });
+
+            
+            function availabledates(nam, thang, goi) {
+                $.ajax({
+                    url: "/Webmaster/QuangCao/GetDates",
+                    type: "post",
+                    data: { "nam": nam, "thang":thang, "goi":goi },
+                    success: function (data) {
+                        if (data == null) {
+                            $(`#them_thongbao_thang`).text("Tháng " + thang + " không có ngày phù hợp"); 
+                        }
+                        else $(`#them_thongbao_thang`).text("");
+                        var select = document.getElementById("item_them_ngay");
+                        for (var i in data) {
+                            var option = document.createElement("option");
+                            option.text = data[i].day;
+                            select.add(option);
+                        }
+                        
+                    },
+                    error: function (data) {
+                        alert("Error: " + data);
+                    }
+                });
+            }
+            
+            function getthoiluong(goi) {
+                $.ajax({
+                    url: "/Webmaster/QuangCao/GetThoiLuong",
+                    type: "post",
+                    data: { "goi": goi },
+                    
+                    success: function (data) {
+                        document.getElementById('item_them_thoiluong').value = data + " tuần";
+                        
+                        },
+
+                    
+                    error: function (data) {
+                        alert("Error: " + data);
+                    }
+                });
+            }
+            var thoiluong;
+            function setthoiluong(something) {
+                thoiluong = something;
+            }
+            function gettenvitri(goi) {
+                $.ajax({
+                    url: "/Webmaster/QuangCao/GetTenViTri",
+                    type: "post",
+                    data: { "goi": goi },
+
+                    success: function (data) {
+                        document.getElementById('item_them_tenvitri').value = data;
+                        
+                    },
+
+
+                    error: function (data) {
+                        alert("Error: " + data);
+                    }
+                });
+            }
+            
+            function changenam() {
+                var nam = document.getElementById('item_them_nam').value;
+                var goi = document.getElementById('item_them_goiquangcao').value;
+                var thang = document.getElementById('item_them_thang').value;  
+                
+               if (nam < @DateTime.Now.Year.ToString())
+               {
+                   
+                   document.getElementById('item_them_nam').value = @DateTime.Now.Year.ToString();
+                   
+               }
+               
+                   
+                document.getElementById('item_them_thang').readOnly = false;
+                
+                nam = document.getElementById('item_them_nam').value;
+                
+
+
+
+                if (nam ==@DateTime.Now.Year) {
+                    document.getElementById('item_them_thang').min =@DateTime.Now.Month;
+
+                }
+                else {
+                    document.getElementById('item_them_thang').min = 1;
+
+                }
+               
+                document.getElementById("item_them_ngay").options.length = 0;
+                document.getElementById("item_them_thang").value = null;
+              
+            }
+                
+
+
+                
+            async function changethang() { 
+
+                var nam = document.getElementById('item_them_nam').value;
+                var goi = document.getElementById('item_them_goiquangcao').value;
+                var thang = document.getElementById('item_them_thang').value;     
+                if (thang > 12)
+               {
+                    document.getElementById('item_them_thang').value = 12;
+                }
+                if (thang < @DateTime.Now.Month) {
+                    document.getElementById('item_them_thang').value = document.getElementById('item_them_thang').min;
+                }
+                thang = document.getElementById('item_them_thang').value;
+               while (document.getElementById("item_them_ngay").options.length > 0) {
+                   document.getElementById("item_them_ngay").remove(0);
+               }
+                    document.getElementById('item_them_ngay').readOnly = false;
+                
+                availabledates(nam, thang, goi);
+                
+               
+            }
+            
+            
+            function changengay() {  
+                
+            }
+            function changegoi() {
+                var goi = document.getElementById('item_them_goiquangcao').value;    
+                document.getElementById("item_them_nam").readOnly = false;
+                document.getElementById('item_them_ngay').readOnly = true;
+                document.getElementById('item_them_thang').readOnly = true;
+                document.getElementById('item_them_nam').value = null;
+                document.getElementById('item_them_ngay').value = null;
+                document.getElementById('item_them_thang').value = null;
+                while (document.getElementById("item_them_ngay").options.length > 0) {
+                    document.getElementById("item_them_ngay").remove(0);
+                }
+                //document.getElementById('item_them_ngayketthuc').value = null;
+                getthoiluong(goi);
+                gettenvitri(goi);
+            }
+
+            function checktaikhoan(taikhoan) {
+                
+                    $.ajax({
+                        url: "/Webmaster/QuangCao/CheckTaiKhoan",
+                        type: "post",
+                        data: { "taikhoan": taikhoan },
+
+                        success: function (data) {
+                            if (data != null) {
+                                $(`#them_thongbao_taikhoan`).text("");
+                                $("#btnThemModal").attr('disabled', false);
+                            }
+                            else {
+                                $(`#them_thongbao_taikhoan`).text("Không tìm thấy tài khoản này");
+                                $("#btnThemModal").attr('disabled', true);
+                            }
+
+                        },
+
+
+                        error: function (data) {
+                            alert("Error: " + data);
+                        }
+                    });
+            }
+            function checkma(ma) {
+
+                $.ajax({
+                    url: "/Webmaster/QuangCao/CheckMa",
+                    type: "post",
+                    data: { "ma": ma },
+
+                    success: function (data) {
+                        if (data == null) {
+                            $(`#them_thongbao_ma`).text("");
+                            $("#btnThemModal").attr('disabled', false);
+                        }
+                        else {
+                            $("#btnThemModal").attr('disabled', true);
+                            $(`#them_thongbao_ma`).text("Mã đã tồn tại");
+                            
+                        }
+
+                    },
+
+
+                    error: function (data) {
+                        alert("Error: " + data);
+                    }
+                });
+            }
+            $("#item_them_ma").change(function () {
+                var ma = document.getElementById("item_them_ma").value;
+               
+                checkma(ma);
+            });
+            $("#item_them_taikhoan").change(function () {
+                var taikhoan = document.getElementById("item_them_taikhoan").value;
+                checktaikhoan(taikhoan);
+            });
+
+
+            
+            
+           //function ngayketthuc() {
+           //     var nam = document.getElementById('item_them_nam').value;
+           //     var ngay = document.getElementById('item_them_ngay').value;
+           //     var thang = document.getElementById('item_them_thang').value;
+           //     var d = new Date(nam, thang - 1, ngay);
+
+           //     d.setDate(d.getDate() + thoiluong * 7);
+           //     var month = d.getMonth() + 1;
+           //     document.getElementById('item_them_ngayketthuc').value = d.getDate() + '/' + month + '/' + d.getFullYear();
+           // }
+            
+        </script>

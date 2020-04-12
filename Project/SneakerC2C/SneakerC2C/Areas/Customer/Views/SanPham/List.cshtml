@@ -1,0 +1,646 @@
+﻿@model IEnumerable<Models.Database.SanPham>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "List";
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+}
+
+<div class="page-head_agile_info_w3l">
+    <div class="container">
+        @if (Context.Request.QueryString.Value.Contains("ploai=Nam"))
+        {
+            <h3><span>Giày </span>Nam</h3>
+        }
+        else
+        {
+            @if (Context.Request.QueryString.Value.Contains("ploai=Nu"))
+            {
+                <h3><span>Giày </span>Nữ</h3>
+            }
+            else
+            {
+                <h3><span>Sản </span>phẩm</h3>
+            }
+        }
+        <!--/w3_short-->
+        <div class="services-breadcrumb">
+            <div class="agile_inner_breadcrumb">
+
+                <ul class="w3_short">
+                    <li><a asp-area="Customer" asp-controller="Home" asp-action="Index">Trang Chủ</a><i>|</i></li>
+                    @if (Context.Request.QueryString.Value.Contains("ploai=Nam"))
+                    {
+                        <li>Giày nam</li>
+                    }
+                    else
+                    {
+                        @if (Context.Request.QueryString.Value.Contains("ploai=Nu"))
+                        {
+                            <li>Giày nữ</li>
+                        }
+                        else
+                        {
+                            <li>Sản phẩm</li>
+                        }
+                    }
+                </ul>
+            </div>
+        </div>
+        <!--//w3_short-->
+    </div>
+</div>
+
+<div class="banner-bootom-w3-agileits">
+    <div class="container">
+        <!-- mens -->
+        <div class="col-md-4 products-left">
+            <div class="filter-price">
+                <h3>Tìm kiếm theo giá</h3>
+                <ul class="dropdown-menu6">
+                    <li style="text-align: center;">
+                        <div id="slider-range">
+                        </div>
+                        @if (ViewBag.Search != null || ViewBag.ThuongHieu != null || ViewBag.PhanLoai != null)
+                        {
+                            <form asp-area="Customer" asp-controller="SanPham" asp-action="FilterAndSearch" method="get">
+                                <input type="text" name="filter" id="amount" style="border: 0; color: #ffffff; font-weight: normal;" />
+                                <input hidden type="text" name="search" value="@ViewBag.Search" style="border: 0; color: #ffffff; font-weight: normal;" />
+                                <input hidden type="text" name="ploai" value="@ViewBag.PhanLoai" style="border: 0; color: #ffffff; font-weight: normal;" />
+                                <input hidden type="text" name="mahang" value="@ViewBag.ThuongHieu" style="border: 0; color: #ffffff; font-weight: normal;" />
+                                <div class="snipcart-details top_brand_home_details item_add single-item hvr-outline-out button2">
+                                    <fieldset>
+                                        <input type="submit" id="btnFilter" value="Lọc" class="button">
+                                    </fieldset>
+                                </div>
+                            </form>
+                        }
+                        else
+                        {
+                            <form asp-area="Customer" asp-controller="SanPham" asp-action="Filter" method="get">
+                                <input type="text" name="filter" id="amount" style="border: 0; color: #ffffff; font-weight: normal;" />
+                                <div class="snipcart-details top_brand_home_details item_add single-item hvr-outline-out button2">
+                                    <fieldset>
+                                        <input type="submit" id="btnFilter" name="submit" value="Lọc" class="button">
+                                    </fieldset>
+                                </div>
+                            </form>
+                        }
+                    </li>
+                </ul>
+            </div>
+            <div class="css-treeview">
+                <h4>Danh Mục</h4>
+                <ul class="tree-list-pad">
+                    <li>
+                        <a asp-area="Customer" asp-controller="SanPham" asp-action="PhanLoai" asp-route-ploai="Nam"><label for="item-0"><i class="fa fa-long-arrow-right" aria-hidden="true"></i> Giày Nam</label></a>
+                    </li>
+                    <li>
+                        <a asp-area="Customer" asp-controller="SanPham" asp-action="PhanLoai" asp-route-ploai="Nu"><label for="item-1"><i class="fa fa-long-arrow-right" aria-hidden="true"></i> Giày Nữ</label></a>
+                    </li>
+                    <li>
+                        <input type="checkbox" checked="checked" id="item-2" /><label for="item-2"><i class="fa fa-long-arrow-right" aria-hidden="true"></i> Thương Hiệu</label>
+                        <ul>
+                            @foreach (var item in ViewBag.Hang)
+                            {
+                                <li>
+                                    <a asp-area="Customer" asp-controller="SanPham" asp-action="ThuongHieu" asp-route-mahang="@item.MaHang"><label for="item-2-0"><i class="fa fa-long-arrow-right" aria-hidden="true"></i>@item.TenHang</label></a>
+                                </li>
+                            }
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="community-poll">
+                <h4>Đánh giá</h4>
+                <div class="swit form">
+                    <form>
+                        <div class="check_box"> <div class="radio"> <label><input type="radio" name="radio" checked=""><i></i>4 sao trở lên</label> </div></div>
+                        <div class="check_box"> <div class="radio"> <label><input type="radio" name="radio"><i></i>3 sao trở lên</label> </div></div>
+                        <div class="check_box"> <div class="radio"> <label><input type="radio" name="radio"><i></i>2 sao trở lên</label> </div></div>
+                        <div class="check_box"> <div class="radio"> <label><input type="radio" name="radio"><i></i>1 sao trở lên</label> </div></div>
+                        <input type="submit" value="TÌM">
+                    </form>
+                </div>
+            </div>
+
+            <div class="clearfix"></div>
+        </div>
+        <div class="col-md-8 products-right">
+            @if (Context.Request.QueryString.Value.Contains("ploai=Nam"))
+            {
+                <h5>Giày Nam</h5>
+            }
+            else
+            {
+                @if (Context.Request.QueryString.Value.Contains("ploai=Nữ"))
+                {
+                    <h5>Giày Nữ</h5>
+                }
+                else
+                {
+                    <h5>Sản phẩm</h5>
+                }
+            }
+            <div class="sort-grid">
+                <div class="sorting">
+                    <select class="form-control frm-field required sect" id="sortList" onchange="window.location.href = SearchAndSort()">
+                        <option selected disabled>Sắp xếp theo</option>
+                        <option value="/Customer/SanPham/Sort?sortorder=moinhat">Mới nhất</option>
+                        <option value="/Customer/SanPham/Sort?sortorder=banchay">Bán chạy</option>
+                        <option value="/Customer/SanPham/Sort?sortorder=tensanpham-az">Tên sản phẩm (A-Z)</option>
+                        <option value="/Customer/SanPham/Sort?sortorder=tensanpham-za">Tên sản phẩm (Z-A)</option>
+                        <option value="/Customer/SanPham/Sort?sortorder=gia-asc">Giá thấp</option>
+                        <option value="/Customer/SanPham/Sort?sortorder=gia-desc">Giá cao</option>
+                    </select>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="men-wear-top">
+                <div id="top" class="callbacks_container">
+                    <ul class="rslides" id="slider3">
+                        <li>
+                            <img class="img-responsive" src="~/Hinh/Banner/banner2.jpg" alt=" " />
+                        </li>
+                        <li>
+                            <img class="img-responsive" src="~/Hinh/Banner/banner5.jpg" alt=" " />
+                        </li>
+                        <li>
+                            <img class="img-responsive" src="~/Hinh/Banner/banner2.jpg" alt=" " />
+                        </li>
+
+                    </ul>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="men-wear-bottom">
+                <div class="col-sm-4 men-wear-left">
+                    <img class="img-responsive" src="~/maintemplate/images/bb2.jpg" alt=" " />
+                </div>
+                <div class="col-sm-8 men-wear-right">
+                    <h4>Exclusive Men's <span>Collections</span></h4>
+                    <p>
+                        Sed ut perspiciatis unde omnis iste natus error sit voluptatem
+                        accusantium doloremque laudantium, veritatis et quasi architecto beatae vitae dicta sunt
+                        explicabo.
+                    </p>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+            @{
+                int i = 1;
+            }
+            @foreach (var item in Model)
+            {
+                if (i <= 3)
+                {
+                    <div class="col-md-4 product-men">
+                        <div class="men-pro-item simpleCart_shelfItem">
+                            <div class="men-thumb-item">
+                                <a asp-area="Customer" asp-controller="SanPham" asp-action="Index" asp-route-id="@item.Id">
+                                    <div class="anhsanpham-3" style="background-image: url(/Hinh/SanPham/@item.Hinh);"></div>
+                                </a>
+                            </div>
+                            <div class="item-info-product ">
+                                <h4><a asp-area="Customer" asp-controller="SanPham" asp-action="Index" asp-route-id="@item.Id" class="tieude_sanpham">@item.TenSanPham</a></h4>
+                                <div class="info-product-price">
+                                    @if (item.GiamGia != null && item.GiamGia != 0)
+                                    {
+                                        double gia = item.Gia * (100 - item.GiamGia) / 100 ?? 0;
+                                        <p><span class="item_price">@gia.ToString("#,###") đ</span> <del>- @item.Gia.Value.ToString("#,###") đ</del></p>
+                                    }
+                                    else
+                                    {
+                                        <p><span class="item_price">@item.Gia.Value.ToString("#,###") đ</span></p>
+                                    }
+                                </div>
+                                @*<div class="snipcart-details top_brand_home_details item_add single-item hvr-outline-out button2">
+                                        <form action="#" method="post">
+                                            <fieldset>
+                                                <input type="submit" name="submit" value="Thêm vào giỏ hàng" class="button btnThemGioHang">
+                                            </fieldset>
+                                        </form>
+                                    </div>*@
+                            </div>
+                        </div>
+                    </div>
+                    i++;
+                }
+                if (i == 4)
+                {
+                    <div class="clearfix"></div>
+                }
+                if (i >= 4)
+                {
+                    break;
+                }
+            }
+        </div>
+
+        <div class="single-pro">
+            @{
+                int j = 1;
+            }
+            @foreach (var item in Model)
+            {
+                if (j < 4)
+                {
+                    j++;
+                    continue;
+                }
+                if (j >= 4)
+                {
+                    <div class="col-md-3 product-men">
+                        <div class="men-pro-item simpleCart_shelfItem">
+                            <div class="men-thumb-item">
+                                <a asp-area="Customer" asp-controller="SanPham" asp-action="Index" asp-route-id="@item.Id">
+                                    <div class="anhsanpham-4" style="background-image: url(/Hinh/SanPham/@item.Hinh);"></div>
+                                </a>
+                            </div>
+                            <div class="item-info-product ">
+                                <h4><a asp-area="Customer" asp-controller="SanPham" asp-action="Index" asp-route-id="@item.Id" class="tieude_sanpham">@item.TenSanPham</a></h4>
+                                <div class="info-product-price">
+                                    <div class="info-product-price">
+                                        @if (item.GiamGia != null && item.GiamGia != 0)
+                                        {
+                                            double gia = item.Gia * (100 - item.GiamGia) / 100 ?? 0;
+                                            <p><span class="item_price">@gia.ToString("#,###") đ</span> <del>- @item.Gia.Value.ToString("#,###") đ</del></p>
+                                        }
+                                        else
+                                        {
+                                            <p><span class="item_price">@item.Gia.Value.ToString("#,###") đ</span></p>
+                                        }
+                                    </div>
+                                </div>
+                                @*<div class="snipcart-details top_brand_home_details item_add single-item hvr-outline-out button2">
+                                        <form action="#" method="post">
+                                            <fieldset>
+                                                <input type="submit" name="submit" value="Thêm vào giỏ hàng" class="button btnThemVaoGioHang" />
+                                            </fieldset>
+                                        </form>
+                                    </div>*@
+                            </div>
+                        </div>
+                    </div>
+                    j++;
+                    if (j % 4 == 0)
+                    {
+                        <div class="clearfix"></div>
+                    }
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<!--phân trang-->
+<div class="container">
+    <ul class="phantrang modal-1">
+        @if (ViewBag.TrangHienTai == 1)
+        {
+            <li><a href="#" class="prev disabled">&laquo</a></li>
+        }
+        else
+        {
+            <li>
+                @switch (ViewBag.TrangThai)
+                {
+                    case "index":
+                        <a asp-controller="SanPham" asp-action="List" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai - 1)" class="prev pageNumber">&laquo</a>
+                        break;
+                    case "sort":
+                        <a asp-controller="SanPham" asp-action="Sort" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai - 1)" class="prev pageNumber">&laquo</a>
+                        break;
+                    case "search":
+                        <a asp-controller="SanPham" asp-action="Search" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai - 1)" class="prev pageNumber">&laquo</a>
+                        break;
+                    case "searchandsort":
+                        <a asp-controller="SanPham" asp-action="SearchAndSort" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai - 1)" class="prev pageNumber">&laquo</a>
+                        break;
+                    case "ploai":
+                        <a asp-controller="SanPham" asp-action="PhanLoai" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai - 1)" class="prev pageNumber">&laquo</a>
+                        break;
+                    case "thuonghieu":
+                        <a asp-controller="SanPham" asp-action="ThuongHieu" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai - 1)" class="prev pageNumber">&laquo</a>
+                        break;
+                    case "classifyandsort":
+                        <a asp-controller="SanPham" asp-action="ClassifyAndSort" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai - 1)" class="prev pageNumber">&laquo</a>
+                        break;
+                    case "brandandsort":
+                        <a asp-controller="SanPham" asp-action="BrandAndSort" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai - 1)" class="prev pageNumber">&laquo</a>
+                        break;
+                    case "filter":
+                        <a asp-controller="SanPham" asp-action="Filter" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai - 1)" class="prev pageNumber">&laquo</a>
+                        break;
+                    case "filterandsearch":
+                        <a asp-controller="SanPham" asp-action="FilterAndSearch" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai - 1)" class="prev pageNumber">&laquo</a>
+                        break;
+                    case "filterandsearchandsort":
+                        <a asp-controller="SanPham" asp-action="FilterAndSearchAndSort" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai - 1)" class="prev pageNumber">&laquo</a>
+                        break;
+                }
+            </li>
+        }
+        @for (int trang = 1; trang <= ViewBag.TongTrang; trang++)
+        {
+            if (trang > 5)
+            {
+                <li disabled><a href="#">...</a></li>
+                <li>
+                    @switch (ViewBag.TrangThai)
+                    {
+                        case "index":
+                            <a asp-controller="SanPham" asp-action="List" asp-route-pagenumber="@Html.Raw(ViewBag.TongTrang)" class="pageNumber">@ViewBag.TongTrang</a>
+                            break;
+                        case "sort":
+                            <a asp-controller="SanPham" asp-action="Sort" asp-route-pagenumber="@Html.Raw(ViewBag.TongTrang)" class="pageNumber">@ViewBag.TongTrang</a>
+                            break;
+                        case "search":
+                            <a asp-controller="SanPham" asp-action="Search" asp-route-pagenumber="@Html.Raw(ViewBag.TongTrang)" class="pageNumber">@ViewBag.TongTrang</a>
+                            break;
+                        case "searchandsort":
+                            <a asp-controller="SanPham" asp-action="SearchAndSort" asp-route-pagenumber="@Html.Raw(ViewBag.TongTrang)" class="pageNumber">@ViewBag.TongTrang</a>
+                            break;
+                        case "ploai":
+                            <a asp-controller="SanPham" asp-action="PhanLoai" asp-route-pagenumber="@Html.Raw(ViewBag.TongTrang)" class="pageNumber">@ViewBag.TongTrang</a>
+                            break;
+                        case "thuonghieu":
+                            <a asp-controller="SanPham" asp-action="ThuongHieu" asp-route-pagenumber="@Html.Raw(ViewBag.TongTrang)" class="pageNumber">@ViewBag.TongTrang</a>
+                            break;
+                        case "classifyandsort":
+                            <a asp-controller="SanPham" asp-action="ClassifyAndSort" asp-route-pagenumber="@Html.Raw(ViewBag.TongTrang)" class="pageNumber">@ViewBag.TongTrang</a>
+                            break;
+                        case "brandandsort":
+                            <a asp-controller="SanPham" asp-action="BrandAndSort" asp-route-pagenumber="@Html.Raw(ViewBag.TongTrang)" class="pageNumber">@ViewBag.TongTrang</a>
+                            break;
+                        case "filter":
+                            <a asp-controller="SanPham" asp-action="Filter" asp-route-pagenumber="@Html.Raw(ViewBag.TongTrang)" class="pageNumber">@ViewBag.TongTrang</a>
+                            break;
+                        case "filterandsearch":
+                            <a asp-controller="SanPham" asp-action="FilterAndSearch" asp-route-pagenumber="@Html.Raw(ViewBag.TongTrang)" class="pageNumber">@ViewBag.TongTrang</a>
+                            break;
+                        case "filterandsearchandsort":
+                            <a asp-controller="SanPham" asp-action="FilterAndSearchAndSort" asp-route-pagenumber="@Html.Raw(ViewBag.TongTrang)" class="pageNumber">@ViewBag.TongTrang</a>
+                            break;
+                    }
+                </li>
+                break;
+            }
+            else
+            {
+                if (trang == ViewBag.TrangHienTai)
+                {
+                    <li><a class="active" href="#">@trang</a></li>
+                }
+                else
+                {
+                    <li class="paginate_button page-item" aria-controls="dataTables-example" tabindex="0">
+                        @switch (ViewBag.TrangThai)
+                        {
+                            case "index":
+                                <a asp-controller="SanPham" asp-action="List" asp-route-pagenumber="@trang" class="pageNumber">@trang</a>
+                                break;
+                            case "sort":
+                                <a asp-controller="SanPham" asp-action="Sort" asp-route-pagenumber="@trang" class="pageNumber">@trang</a>
+                                break;
+                            case "search":
+                                <a asp-controller="SanPham" asp-action="Search" asp-route-pagenumber="@trang" class="pageNumber">@trang</a>
+                                break;
+                            case "searchandsort":
+                                <a asp-controller="SanPham" asp-action="SearchAndSort" asp-route-pagenumber="@trang" class="pageNumber">@trang</a>
+                                break;
+                            case "ploai":
+                                <a asp-controller="SanPham" asp-action="PhanLoai" asp-route-pagenumber="@trang" class="pageNumber">@trang</a>
+                                break;
+                            case "thuonghieu":
+                                <a asp-controller="SanPham" asp-action="ThuongHieu" asp-route-pagenumber="@trang" class="pageNumber">@trang</a>
+                                break;
+                            case "classifyandsort":
+                                <a asp-controller="SanPham" asp-action="ClassifyAndSort" asp-route-pagenumber="@trang" class="pageNumber">@trang</a>
+                                break;
+                            case "brandandsort":
+                                <a asp-controller="SanPham" asp-action="BrandAndSort" asp-route-pagenumber="@trang" class="pageNumber">@trang</a>
+                                break;
+                            case "filter":
+                                <a asp-controller="SanPham" asp-action="Filter" asp-route-pagenumber="@trang" class="pageNumber">@trang</a>
+                                break;
+                            case "filterandsearch":
+                                <a asp-controller="SanPham" asp-action="FilterAndSearch" asp-route-pagenumber="@trang" class="pageNumber">@trang</a>
+                                break;
+                            case "filterandsearchandsort":
+                                <a asp-controller="SanPham" asp-action="FilterAndSearchAndSort" asp-route-pagenumber="@trang" class="pageNumber">@trang</a>
+                                break;
+                        }
+                    </li>
+                }
+            }
+        }
+        @if (ViewBag.TrangHienTai == ViewBag.TongTrang)
+        {
+            <li class="disabled next"><a href="#">&raquo;</a></li>
+        }
+        else
+        {
+            <li class="next">
+                @switch (ViewBag.TrangThai)
+                {
+                    case "index":
+                        <a asp-controller="SanPham" asp-action="List" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai + 1)" class="pageNumber">&raquo;</a>
+                        break;
+                    case "sort":
+                        <a asp-controller="SanPham" asp-action="Sort" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai + 1)" class="pageNumber">&raquo;</a>
+                        break;
+                    case "search":
+                        <a asp-controller="SanPham" asp-action="Search" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai + 1)" class="pageNumber">&raquo;</a>
+                        break;
+                    case "searchandsort":
+                        <a asp-controller="SanPham" asp-action="SearchAndSort" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai + 1)" class="pageNumber">&raquo;</a>
+                        break;
+                    case "ploai":
+                        <a asp-controller="SanPham" asp-action="PhanLoai" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai + 1)" class="pageNumber">&raquo;</a>
+                        break;
+                    case "thuonghieu":
+                        <a asp-controller="SanPham" asp-action="ThuongHieu" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai + 1)" class="pageNumber">&raquo;</a>
+                        break;
+                    case "classifyandsort":
+                        <a asp-controller="SanPham" asp-action="ClassifyAndSort" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai + 1)" class="pageNumber">&raquo;</a>
+                        break;
+                    case "brandandsort":
+                        <a asp-controller="SanPham" asp-action="BrandAndSort" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai + 1)" class="pageNumber">&raquo;</a>
+                        break;
+                    case "filter":
+                        <a asp-controller="SanPham" asp-action="Filter" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai + 1)" class="pageNumber">&raquo;</a>
+                        break;
+                    case "filterandsearch":
+                        <a asp-controller="SanPham" asp-action="FilterAndSearch" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai + 1)" class="pageNumber">&raquo;</a>
+                        break;
+                    case "filterandsearchandsort":
+                        <a asp-controller="SanPham" asp-action="FilterAndSearchAndSort" asp-route-pagenumber="@Html.Raw(ViewBag.TrangHienTai + 1)" class="pageNumber">&raquo;</a>
+                        break;
+                }
+            </li>
+        }
+    </ul>
+</div>
+<!-- Quảng cáo-->
+<div class="container">
+    <div class="quangcao">
+        <div class="quangcao_item3">
+            <a href="#" id="VTC1a">
+                <img class="fix_kichthuoc_qc anh_quangcao3" id="VTC1" src="~/Hinh/QuangCao/qc350x110_1.jpg" />
+            </a>
+        </div>
+        <div class="quangcao_item3">
+            <a href="#" id="VTC2a">
+                <img class="fix_kichthuoc_qc anh_quangcao3" id="VTC2" src="~/Hinh/QuangCao/qc350x110_2.jpg" />
+            </a>
+        </div>
+        <div class="quangcao_item3">
+            <a href="#" id="VTC3a">
+                <img class="fix_kichthuoc_qc anh_quangcao3" id="VTC3" src="~/Hinh/QuangCao/qc350x110_3.jpg" />
+            </a>
+        </div>
+    </div>
+</div>
+<!-- Quảng cáo-->
+<br />
+<!--hết phân trang-->
+<!-- js -->
+<script type="text/javascript" src="~/maintemplate/js/jquery-2.1.4.min.js"></script>
+<script>
+    $(document).ready(function () {
+        //Sắp xếp
+        let sort = "@ViewBag.Sort";
+        if (sort != '') {
+            $("#sortList option").each(function () {
+                if ($(this).val().includes(sort)) {
+                    $(this).attr('selected', 'selected');
+                    return;
+                }
+            });
+        }
+    });
+
+    function SearchAndSort() {
+        let search = "@Html.Raw(ViewBag.Search)";
+        let ploai = "@Html.Raw(ViewBag.PhanLoai)";
+        let mahang = "@Html.Raw(ViewBag.ThuongHieu)";
+        let filter = "@Html.Raw(ViewBag.Filter)";
+        if (filter != null || filter != '') {
+            let href = $("#sortList").val();
+            href = href.replace("Sort", "FilterAndSearchAndSort");
+            href = href + (`&search=${search}&ploai=${ploai}&mahang=${mahang}&filter=${filter}`)
+            return href;
+        }
+        else {
+            if (search == null || search == '') {
+                if (ploai == null || ploai == '') {
+                    if (mahang == null || mahang == '') {
+                        return $("#sortList").val();
+                    }
+                    else {
+                        let href = $("#sortList").val();
+                        href = href.replace("Sort", "BrandAndSort");
+                        href = href + (`&mahang=${mahang}`)
+                        return href;
+                    }
+                }
+                else {
+                    let href = $("#sortList").val();
+                    href = href.replace("Sort", "ClassifyAndSort");
+                    href = href + (`&ploai=${ploai}`)
+                    return href;
+                }
+            }
+            else {
+                let href = $("#sortList").val();
+                href = href.replace("Sort", "SearchAndSort");
+                href = href + (`&search=${search}`)
+                return href;
+            }
+        }
+    }
+
+    $(".pageNumber").click(function () {
+        //Get addtional href
+        let sort = $("#sortList").val();
+        let search = "@Html.Raw(ViewBag.Search)";
+        let ploai = "@Html.Raw(ViewBag.PhanLoai)";
+        let mahang = "@Html.Raw(ViewBag.ThuongHieu)";
+        let filter = "@Html.Raw(ViewBag.Filter)";
+        //Href
+        var $link = $('.pageNumber');
+        var href = $link.attr('href').split('/');
+        if (sort != null && sort != '') {
+            sort = sort.substring(sort.lastIndexOf('=') + 1, sort.length);
+            href.push('&sortorder=' + sort); //here you set your new asp-route-pagenumber value
+        }
+        if (search != null && search != '') {
+            href.push('&search=' + search); //here you set your new asp-route-pagenumber value
+        }
+        if(ploai != null && ploai != '') {
+            href.push('&ploai=' + ploai); //here you set your new asp-route-pagenumber value
+        }
+        if (mahang != null && mahang != '') {
+            href.push('&mahang=' + mahang); //here you set your new asp-route-pagenumber value
+        }
+        if (filter != null && filter != '') {
+            href.push('&filter=' + filter); //here you set your new asp-route-pagenumber value
+        }
+        href = href.join('/');
+        href = href.toString().replace(/\/&/g, '&');
+        $link.attr('href', href);
+    });
+
+    $("#amount").change(function () {
+        console.log($(this).val());
+        console.log("a");
+    });
+    $("#amount").mouseover(function () {
+        console.log("a");
+        console.log($(this).val());
+    });
+    
+window.onload = loadhetquangcao();
+function loadquangcao(mavitri) {
+        let taga = mavitri + "a";
+        $.ajax({
+            url: "/Customer/QuangCao/LoadQuangCao",
+            type: "post",
+            data: { "mavitri": mavitri },
+            dataType: 'json',
+
+            success: function (data) {
+                if (data != null) {
+                    
+                    //let obj = JSON.parse(data);
+                   
+                    $("#"+taga).attr("href", "http://www."+data.DuongDan);
+                    $("#"+mavitri).attr("src", "/Hinh/QuangCao/"+data.Hinh);
+                    //alert(data);
+                }
+                else {
+                      
+                    document.getElementById(taga).href = "#";
+                    
+                }
+
+                   
+
+            },
+
+
+            error: function (jqXHR, exception) {
+                alert( exception + " " + jqXHR.status);
+            }
+           
+        });
+        
+    }
+    function loadhetquangcao() {
+        loadquangcao('VTC1');
+        loadquangcao('VTC2');
+        loadquangcao('VTC3');
+    }
+</script>
